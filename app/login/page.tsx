@@ -3,8 +3,8 @@
 import type React from "react"
 import type { PostgrestError } from "@supabase/supabase-js"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useSupabase } from "@/lib/supabase-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,10 +16,24 @@ import Link from "next/link"
 export default function LoginPage() {
   const { supabase } = useSupabase()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get("redirectedFrom") || "/dashboard"
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+
+  // Verificar se o usuário já está autenticado
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession()
+      if (data.session) {
+        router.push("/dashboard")
+      }
+    }
+
+    checkSession()
+  }, [supabase, router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,7 +54,8 @@ export default function LoginPage() {
         description: "Você será redirecionado para o dashboard.",
       })
 
-      router.push("/dashboard")
+      // Redirecionamento imediato
+      router.push(redirectTo)
       router.refresh()
     } catch (error: unknown) {
       const errorMessage =
@@ -57,8 +72,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <Card className="w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center px-4 bg-gradient-to-b from-background to-muted">
+      <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Login</CardTitle>
           <CardDescription>Entre com seu email e senha para acessar sua conta</CardDescription>

@@ -28,6 +28,17 @@ interface DateRange {
   to: Date
 }
 
+// Interface para transações recentes
+interface RecentTransaction {
+  id: string
+  date: string
+  amount: number
+  type: string
+  description: string
+  accounts: { name: string }
+  categories: { name: string; color: string; icon: string }
+}
+
 export default function DashboardPage() {
   const { supabase } = useSupabase()
   const [isLoading, setIsLoading] = useState(true)
@@ -37,7 +48,7 @@ export default function DashboardPage() {
     totalExpense: 0,
     accountsCount: 0,
   })
-  const [recentTransactions, setRecentTransactions] = useState<any[]>([]) // Corrigido para any[]
+  const [recentTransactions, setRecentTransactions] = useState<RecentTransaction[]>([]) // Tipo específico em vez de any[]
   const [period, setPeriod] = useState<PeriodType>("month")
   const [dateRange, setDateRange] = useState<DateRange>({
     from: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
@@ -87,7 +98,7 @@ export default function DashboardPage() {
             .reduce((sum: number, t: Transaction) => sum + t.amount, 0) || 0
 
         // Buscar transações recentes
-        const { data: recentTransactions } = await supabase
+        const { data: recentTransactionsData } = await supabase
           .from("transactions")
           .select(`
             *,
@@ -104,7 +115,7 @@ export default function DashboardPage() {
           accountsCount,
         })
 
-        setRecentTransactions(recentTransactions || [])
+        setRecentTransactions((recentTransactionsData as RecentTransaction[]) || [])
       } catch (error) {
         console.error("Erro ao buscar dados do dashboard:", error)
       } finally {

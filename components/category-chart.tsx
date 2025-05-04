@@ -5,14 +5,7 @@ import { useSupabase } from "@/lib/supabase-provider"
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatCurrency } from "@/lib/utils"
 
-interface Transaction {
-  amount: number
-  categories: {
-    id: string
-    name: string
-    color: string
-  } | null
-}
+// Removendo a interface Transaction não utilizada
 
 interface CategoryData {
   id: string
@@ -26,6 +19,16 @@ interface CategoryChartProps {
   type: "income" | "expense"
   startDate: Date
   endDate: Date
+}
+
+// Interface para os dados retornados pelo Supabase
+interface TransactionData {
+  amount: number
+  categories: {
+    id: string
+    name: string
+    color: string
+  } | null
 }
 
 export function CategoryChart({ type, startDate, endDate }: CategoryChartProps) {
@@ -64,7 +67,7 @@ export function CategoryChart({ type, startDate, endDate }: CategoryChartProps) 
         let totalAmount = 0
 
         // Corrigindo o tipo para evitar o erro
-        transactionsByCategory?.forEach((transaction: any) => {
+        transactionsByCategory?.forEach((transaction: TransactionData) => {
           if (!transaction.categories) return
 
           const categoryId = transaction.categories.id
