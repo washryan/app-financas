@@ -29,6 +29,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { NotificationList } from "@/components/notifications/notification-list"
+import { ThemeToggle } from "@/components/theme-toggle"
+
+// Importe a função de logout completo
+import { fullLogout } from "@/lib/auth-helpers"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -53,12 +57,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     getUser()
   }, [supabase])
 
+  // Substitua a função handleSignOut existente por esta:
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
+    await fullLogout()
     toast({
       title: "Logout realizado com sucesso",
     })
-    router.push("/")
   }
 
   const navigation = [
@@ -174,6 +178,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               </Button>
             </div>
             <div className="ml-auto flex items-center gap-2">
+              <ThemeToggle />
               <NotificationList />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

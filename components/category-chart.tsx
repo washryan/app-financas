@@ -5,7 +5,15 @@ import { useSupabase } from "@/lib/supabase-provider"
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatCurrency } from "@/lib/utils"
 
-// Removendo a interface Transaction não utilizada
+// Interface para os dados retornados pelo Supabase
+interface TransactionData {
+  amount: number
+  categories: {
+    id: string
+    name: string
+    color: string
+  } | null
+}
 
 interface CategoryData {
   id: string
@@ -19,16 +27,6 @@ interface CategoryChartProps {
   type: "income" | "expense"
   startDate: Date
   endDate: Date
-}
-
-// Interface para os dados retornados pelo Supabase
-interface TransactionData {
-  amount: number
-  categories: {
-    id: string
-    name: string
-    color: string
-  } | null
 }
 
 export function CategoryChart({ type, startDate, endDate }: CategoryChartProps) {
@@ -67,29 +65,34 @@ export function CategoryChart({ type, startDate, endDate }: CategoryChartProps) 
         let totalAmount = 0
 
         // Corrigindo o tipo para evitar o erro
-        transactionsByCategory?.forEach((transaction: TransactionData) => {
-          if (!transaction.categories) return
+        if (transactionsByCategory) {
+          // Convertendo para o tipo correto com uma asserção de tipo
+          const transactions = transactionsByCategory as unknown as TransactionData[]
 
-          const categoryId = transaction.categories.id
-          const amount = transaction.amount || 0
-          totalAmount += amount
+          for (const transaction of transactions) {
+            if (!transaction.categories) continue
 
-          if (categoryMap.has(categoryId)) {
-            const category = categoryMap.get(categoryId)!
-            categoryMap.set(categoryId, {
-              ...category,
-              amount: category.amount + amount,
-            })
-          } else {
-            categoryMap.set(categoryId, {
-              id: categoryId,
-              name: transaction.categories.name,
-              color: transaction.categories.color || "#e2e8f0",
-              amount: amount,
-              percentage: 0,
-            })
+            const categoryId = transaction.categories.id
+            const amount = transaction.amount || 0
+            totalAmount += amount
+
+            if (categoryMap.has(categoryId)) {
+              const category = categoryMap.get(categoryId)!
+              categoryMap.set(categoryId, {
+                ...category,
+                amount: category.amount + amount,
+              })
+            } else {
+              categoryMap.set(categoryId, {
+                id: categoryId,
+                name: transaction.categories.name,
+                color: transaction.categories.color || "#e2e8f0",
+                amount: amount,
+                percentage: 0,
+              })
+            }
           }
-        })
+        }
 
         // Calcular percentagens e ordenar por valor
         const categoriesArray = Array.from(categoryMap.values())

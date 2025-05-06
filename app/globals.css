@@ -47,11 +47,34 @@
   --ring: 224.3 76.3% 48%;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+/* Custom styles */
+.gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+}
+
+.feature-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.hero-pattern {
+  background-image: radial-gradient(circle at 25px 25px, hsl(var(--primary) / 0.15) 2%, transparent 0%),
+    radial-gradient(circle at 75px 75px, hsl(var(--primary) / 0.1) 2%, transparent 0%);
+  background-size: 100px 100px;
 }

@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { createContext, useContext, useEffect, useState } from "react"
-import { createClient } from "@supabase/supabase-js"
+import { createContext, useContext, useState, useEffect } from "react"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Database } from "@/types/supabase"
 
@@ -14,15 +14,14 @@ type SupabaseContext = {
 const Context = createContext<SupabaseContext | undefined>(undefined)
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  const [supabase] = useState(() =>
-    createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!),
-  )
+  const [supabase] = useState(() => createClientComponentClient<Database>())
 
   useEffect(() => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(() => {
-      // Refresh data when auth state changes
+      // Não fazemos nada aqui, apenas garantimos que o estado de autenticação
+      // seja atualizado no cliente
     })
 
     return () => {
